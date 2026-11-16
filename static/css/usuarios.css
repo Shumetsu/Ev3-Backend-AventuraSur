@@ -1,0 +1,128 @@
+/* ---------- Login ---------- */
+.tarjeta-login {
+  width: clamp(320px, 56vw, 800px); min-height: clamp(480px, 74vh, 740px); margin: 0 auto;
+  display: flex; flex-direction: column;
+  padding: clamp(2rem, 5vw, 4.5rem) clamp(1.5rem, 7vw, 6.5rem) 1.75rem;
+  background: #fff; border-radius: 22px; box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28);
+}
+.login-contenido { margin: auto 0; }
+.login-sistema { margin: 0 0 0.15rem; font-size: 1rem; color: var(--texto-suave); }
+.login-titulo {
+  margin: 0 0 2rem; font-size: clamp(2.2rem, 3.6vw, 3.2rem); font-weight: 600;
+  line-height: 1.1; letter-spacing: -0.01em; color: #000;
+}
+.login-form .campo { margin-bottom: 1.25rem; }
+.login-form .campo label { font-size: 1rem; font-weight: 400; color: #000; }
+.login-form .campo input { min-height: 52px; font-size: 1rem; }
+.login-form .acciones { display: flex; justify-content: center; margin-top: 2rem; }
+.login-form .btn-pildora { min-height: 50px; padding: 0 2.2rem; font-size: 0.9rem; }
+.tarjeta-login .pie-tarjeta { margin: 0; padding-top: 1.5rem; font-size: 0.85rem; }
+.aviso {
+  padding: 0.7rem 0.9rem; border-radius: 10px; margin-bottom: 1.25rem;
+  font-size: 0.85rem; border: 1px solid transparent;
+}
+.aviso-error { background: var(--rojo-suave); border-color: #F5B5B5; color: #9B1C1C; }
+.aviso-advertencia { background: var(--aviso-suave); border-color: #F6D66E; color: var(--aviso); }
+.aviso-info { background: var(--azul-suave); border-color: #C7D7EE; color: var(--azul); }
+
+/* ---------- Encabezado de página ---------- */
+.encabezado { margin-bottom: 1.5rem; }
+.encabezado h2 { margin: 0; font-size: 1.5rem; font-weight: 700; }
+.encabezado p { margin: 0.2rem 0 0; color: var(--texto-suave); }
+
+/* ---------- KPI del administrador ---------- */
+.kpi-grid { display: grid; gap: 1.25rem; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.kpi {
+  display: flex; gap: 1rem; align-items: flex-start;
+  padding: 1.25rem 1.4rem; background: var(--superficie);
+  border-radius: var(--radio-grande); box-shadow: var(--sombra);
+}
+.kpi-icono {
+  display: grid; place-items: center; flex: none; width: 48px; height: 48px;
+  border-radius: 12px; background: var(--azul-suave); color: var(--azul);
+}
+.kpi-icono .icono { width: 24px; height: 24px; }
+.kpi-icono.rojo { background: var(--rojo-suave); color: var(--rojo); }
+.kpi-etiqueta { margin: 0; font-size: 0.82rem; font-weight: 500; color: var(--texto-suave); }
+.kpi-valor { margin: 0.1rem 0 0; font-size: 1.9rem; font-weight: 700; line-height: 1.15; color: var(--texto); }
+.kpi-valor small { font-size: 0.95rem; font-weight: 500; color: var(--texto-suave); }
+.kpi-detalle { margin: 0.3rem 0 0; font-size: 0.78rem; color: var(--texto-suave); }
+
+.seccion-titulo { margin: 2rem 0 1rem; font-size: 1.05rem; font-weight: 600; }
+.accesos { display: grid; gap: 1rem; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.acceso {
+  display: flex; align-items: center; gap: 0.85rem;
+  padding: 1rem 1.15rem; background: var(--superficie); color: var(--texto);
+  border: 1px solid var(--borde); border-radius: var(--radio); text-decoration: none;
+  font-weight: 500; font-size: 0.92rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.acceso:hover { border-color: var(--azul); box-shadow: var(--sombra); }
+.acceso .icono { color: var(--azul); width: 22px; height: 22px; }
+
+/* ---------- Inicio del cajero ---------- */
+.cajero-grid { display: grid; gap: 1.5rem; grid-template-columns: 1.5fr 1fr; align-items: stretch; }
+.pos-tarjeta {
+  position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center;
+  min-height: 300px; padding: 2.5rem; border-radius: 20px;
+  background: var(--azul); color: #fff; text-decoration: none;
+  box-shadow: 0 8px 28px rgba(11, 58, 117, 0.3);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.pos-tarjeta:hover { transform: translateY(-2px); box-shadow: 0 12px 34px rgba(11, 58, 117, 0.38); }
+.pos-tarjeta::after {
+  content: ""; position: absolute; top: 1.5rem; right: 1.75rem;
+  width: 64px; height: 64px; border-radius: 50%; background: var(--rojo);
+}
+.pos-tarjeta .icono { width: 44px; height: 44px; margin-bottom: 1rem; }
+.pos-tarjeta h3 { margin: 0; color: #fff; font-size: 2rem; font-weight: 700; }
+.pos-tarjeta p { margin: 0.5rem 0 1.75rem; color: rgba(255, 255, 255, 0.8); max-width: 34ch; }
+.pos-boton {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 0.7rem;
+  padding: 0.8rem 1.5rem; border-radius: 999px; background: #fff; color: var(--azul);
+  font-weight: 700; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.pos-boton .icono { width: 18px; height: 18px; margin: 0; }
+
+.resumen h3 { margin: 0 0 1rem; font-size: 1.05rem; font-weight: 600; }
+.resumen-fila {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 0.9rem 0; border-bottom: 1px solid var(--borde);
+}
+.resumen-fila:last-of-type { border-bottom: 0; }
+.resumen-fila span { color: var(--texto-suave); font-size: 0.9rem; }
+.resumen-fila strong { font-size: 1.35rem; font-weight: 700; }
+.resumen-nota { margin: 1rem 0 0; font-size: 0.78rem; color: var(--texto-suave); }
+
+@media (max-width: 1200px) { .kpi-grid, .accesos { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 900px) {
+  .kpi-grid, .cajero-grid, .accesos { grid-template-columns: 1fr; }
+  .tarjeta-login { width: min(92vw, 560px); min-height: auto; padding: 2rem 1.5rem 1.25rem; }
+}
+
+/* ---------- Gestión de usuarios ---------- */
+.encabezado-acciones {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+  flex-wrap: wrap; margin-bottom: 1.5rem;
+}
+.usuario-celda { display: flex; align-items: center; gap: 0.6rem; }
+.usuario-iniciales {
+  display: inline-grid; place-items: center; flex: none;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--azul-suave); color: var(--azul);
+  font-size: 0.78rem; font-weight: 600; letter-spacing: 0.02em;
+}
+.tabla-hover .acciones { display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap; }
+.formulario-cuerpo { margin-top: 1.25rem; }
+.texto-formulario {
+  display: block; font-size: 0.75rem; color: var(--texto-suave); margin-top: 0.3rem;
+  line-height: 1.45;
+}
+.formulario-cuerpo .aviso { margin: 1.25rem 0; font-size: 0.85rem; }
+.campo-casilla { display: flex; align-items: center; gap: 0.55rem; }
+.campo-casilla input[type="checkbox"] {
+  width: 20px; height: 20px; min-height: 20px; accent-color: var(--azul); cursor: pointer;
+}
+.campo-casilla span { font-size: 0.9rem; color: var(--texto); }
+.tarjeta-angosta { max-width: 640px; margin: 0 auto; }
+

@@ -1,0 +1,38 @@
+{% extends 'base_admin.html' %}
+{% block title %}{{ titulo }} · Aventuras del Sur{% endblock %}
+{% block titulo_pagina %}Usuarios{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card card-primary card-outline">
+            <div class="card-header"><h3 class="card-title">{{ titulo }}</h3></div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="card-body">
+                    <div class="row">
+                        {% if not editando %}
+                        <div class="col-12">{% include 'includes/bs_campo.html' with field=form.username %}</div>
+                        {% endif %}
+                        <div class="col-md-6">{% include 'includes/bs_campo.html' with field=form.first_name %}</div>
+                        <div class="col-md-6">{% include 'includes/bs_campo.html' with field=form.last_name %}</div>
+                        <div class="col-md-6">{% include 'includes/bs_campo.html' with field=form.email %}</div>
+                        <div class="col-md-6">{% include 'includes/bs_campo.html' with field=form.telefono %}</div>
+                        <div class="col-12">{% include 'includes/bs_campo.html' with field=form.rol %}</div>
+                        {% if editando %}
+                        <div class="col-12">{% include 'includes/bs_campo.html' with field=form.is_active %}</div>
+                        {% else %}
+                        <div class="col-md-6">{% include 'includes/bs_campo.html' with field=form.password1 %}</div>
+                        <div class="col-md-6">{% include 'includes/bs_campo.html' with field=form.password2 %}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-end gap-2">
+                    <a href="{% url 'usuario_lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

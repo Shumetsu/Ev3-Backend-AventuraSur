@@ -1,0 +1,104 @@
+{% extends 'base_admin.html' %}
+{% block title %}Calendario · Aventuras del Sur{% endblock %}
+{% block titulo_pagina %}Calendario de actividades{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex flex-wrap align-items-center gap-2">
+        <h3 class="card-title mb-0">{{ nombre_mes }} {{ anio }}</h3>
+        <div class="ms-auto d-flex gap-2">
+            <a href="?anio={{ ant.anio }}&mes={{ ant.mes }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-chevron-left"></i> Anterior
+            </a>
+            <a href="{% url 'calendario' %}" class="btn btn-outline-primary btn-sm">Hoy</a>
+            <a href="?anio={{ sig.anio }}&mes={{ sig.mes }}" class="btn btn-outline-secondary btn-sm">
+                Siguiente <i class="bi bi-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered calendario mb-0">
+                <thead>
+                    <tr class="text-center">
+                        <th>Lunes</th><th>Martes</th><th>Miercoles</th><th>Jueves</th>
+                        <th>Viernes</th><th>Sabado</th><th>Domingo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for semana in semanas %}
+                    <tr>
+                    {% for celda in semana %}
+                        <td class="{% if not celda.dia %}table-light{% endif %} {% if celda.hoy %}dia-hoy{% endif %}">
+                            {% if celda.dia %}
+                                <div class="numero-dia {% if celda.hoy %}fw-bold text-primary{% endif %}">{{ celda.dia }}</div>
+                                {% for i in celda.items %}
+                                <a href="{% url 'experiencia_grupo' i.obj.pk %}"
+                                   class="evento text-bg-{{ i.color }}"
+                                   title="{{ i.obj.titulo }} · {{ i.hora }} · {{ i.obj.get_estado_ruta_display }}">
+                                    {{ i.hora }} {{ i.obj.titulo }}
+                                </a>
+                                {% endfor %}
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="d-flex flex-wrap gap-3 mt-3 small">
+            <span><span class="badge text-bg-info">&nbsp;</span> Programada</span>
+            <span><span class="badge text-bg-warning">&nbsp;</span> En curso</span>
+            <span><span class="badge text-bg-success">&nbsp;</span> Finalizada</span>
+            <span><span class="badge text-bg-danger">&nbsp;</span> Cancelada</span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Actividades de {{ nombre_mes }}</h3></div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                {% for e in del_mes %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <a href="{% url 'experiencia_grupo' e.pk %}" class="fw-semibold text-decoration-none">{{ e.titulo }}</a>
+                            <div class="text-secondary small">
+                                {{ e.fecha_hora|date:"d/m/Y H:i" }} · {{ e.categoria.nombre }}
+                                {% if es_admin %}· {{ e.creador.username }}{% endif %}
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            {% include 'includes/bs_badge_ruta.html' %}
+                            <div class="text-secondary small mt-1">{{ e.n_inscritos }} / {{ e.cupo_maximo }} inscritos</div>
+                        </div>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item text-secondary">No hay actividades este mes.</li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Proximas actividades</h3></div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                {% for e in proximas %}
+                    <li class="list-group-item">
+                        <a href="{% url 'experiencia_grupo' e.pk %}" class="fw-semibold text-decoration-none">{{ e.titulo }}</a>
+                        <div class="text-secondary small">{{ e.fecha_hora|date:"d/m/Y H:i" }}</div>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item text-secondary">Sin actividades proximas.</li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

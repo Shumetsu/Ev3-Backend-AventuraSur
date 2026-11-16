@@ -1,0 +1,78 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+{% block title %}Usuarios - Aventuras del Sur{% endblock %}
+{% block titulo_pagina %}Usuarios{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Cuentas del sistema</h3>
+        <div class="card-tools">
+            <a href="{% url 'usuario_crear' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Nuevo usuario</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="tabla-usuarios" class="table table-hover align-middle w-100">
+                <thead>
+                    <tr><th>Usuario</th><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr>
+                </thead>
+                <tbody>
+                {% for u in usuarios %}
+                    <tr>
+                        <td>{{ u.username }}</td>
+                        <td>{{ u.get_full_name|default:"—" }}</td>
+                        <td>{{ u.email|default:"—" }}</td>
+                        <td>
+                            {% if u.perfil.rol == 'administrador' %}<span class="badge text-bg-primary">{{ u.perfil.get_rol_display }}</span>
+                            {% elif u.perfil.rol == 'guia' %}<span class="badge text-bg-info">{{ u.perfil.get_rol_display }}</span>
+                            {% else %}<span class="badge text-bg-secondary">{{ u.perfil.get_rol_display }}</span>{% endif %}
+                        </td>
+                        <td>
+                            {% if u.is_active %}<span class="badge text-bg-success">Activo</span>
+                            {% else %}<span class="badge text-bg-secondary">Inactivo</span>{% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'usuario_editar' u.pk %}" class="btn btn-outline-primary btn-sm">Editar</a>
+                                {% if u.pk != user.pk %}
+                                    {% if u.is_active %}
+                                    <button type="button" class="btn btn-outline-danger btn-sm btn-eliminar"
+                                            data-url="{% url 'usuario_estado' u.pk %}"
+                                            data-nombre="{{ u.username }}">Desactivar</button>
+                                    {% else %}
+                                    <form method="post" action="{% url 'usuario_estado' u.pk %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success btn-sm">Activar</button>
+                                    </form>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% include 'includes/bs_modal_eliminar.html' with titulo="Desactivar usuario" verbo="desactivar a" boton="Desactivar" volver="Volver" aviso="No podra iniciar sesion, pero sus datos se conservan." %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    $('#tabla-usuarios').DataTable({
+        language: { url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json' },
+        columnDefs: [{ orderable: false, targets: -1 }]
+    });
+</script>
+<script src="{% static 'js/bs_eliminar.js' %}"></script>
+{% endblock %}

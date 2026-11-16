@@ -1,0 +1,40 @@
+{% extends 'base_admin.html' %}
+{% block title %}Valorar · {{ e.titulo }}{% endblock %}
+{% block titulo_pagina %}{% if editando %}Editar mi valoracion{% else %}Valorar experiencia{% endif %}{% endblock %}
+
+{% block content %}
+<a href="{% url 'mis_reservas' %}" class="btn btn-outline-secondary btn-sm mb-3">
+    <i class="bi bi-arrow-left"></i> Volver a mis reservas
+</a>
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card card-primary card-outline">
+            <div class="card-header">
+                <h3 class="card-title">{{ e.titulo }} · {{ e.fecha_hora|date:"d/m/Y" }}</h3>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label d-block">Puntaje</label>
+                        <div class="estrellas">
+                            {% for v in valores %}
+                            <input type="radio" name="puntaje" id="p{{ v }}" value="{{ v }}"
+                                   {% if form.puntaje.value|stringformat:"s" == v|stringformat:"s" %}checked{% endif %}>
+                            <label for="p{{ v }}" title="{{ v }} de 5">★</label>
+                            {% endfor %}
+                        </div>
+                        {% for err in form.puntaje.errors %}<div class="invalid-feedback d-block">{{ err }}</div>{% endfor %}
+                    </div>
+                    {% include 'includes/bs_campo.html' with field=form.comentario %}
+                </div>
+                <div class="card-footer d-flex justify-content-end gap-2">
+                    <a href="{% url 'mis_reservas' %}" class="btn btn-outline-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Guardar valoracion</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends 'base_admin.html' %}
+{% block title %}{{ e.titulo }} · Aventuras del Sur{% endblock %}
+{% block titulo_pagina %}Detalle de la experiencia{% endblock %}
+
+{% block content %}
+<a href="{% url 'catalogo' %}" class="btn btn-outline-secondary btn-sm mb-3">
+    <i class="bi bi-arrow-left"></i> Volver al catalogo
+</a>
+
+<div class="card">
+    <div class="card-body">
+        <span class="badge text-bg-info">{{ e.categoria.nombre }}</span>
+        <h3 class="mt-2 mb-1">{{ e.titulo }}</h3>
+        <p class="text-secondary">Guia: {{ e.creador.get_full_name|default:e.creador.username }}</p>
+
+        <div class="row mt-4">
+            <div class="col-6 col-lg-3">
+                <div class="info-box">
+                    <span class="info-box-icon text-bg-primary shadow-sm"><i class="bi bi-calendar-event"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Fecha</span>
+                        <span class="info-box-number">{{ e.fecha_hora|date:"d/m/Y" }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="info-box">
+                    <span class="info-box-icon text-bg-info shadow-sm"><i class="bi bi-clock"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Hora</span>
+                        <span class="info-box-number">{{ e.fecha_hora|date:"H:i" }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="info-box">
+                    <span class="info-box-icon text-bg-success shadow-sm"><i class="bi bi-cash-coin"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Precio</span>
+                        <span class="info-box-number">${{ e.precio|floatformat:"0g" }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="info-box">
+                    <span class="info-box-icon text-bg-warning shadow-sm"><i class="bi bi-people"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Cupos libres</span>
+                        <span class="info-box-number">{{ cupos }} de {{ e.cupo_maximo }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p>{{ e.descripcion|linebreaksbr }}</p>
+
+        <div class="d-flex flex-wrap align-items-center gap-2 mt-4">
+            {% if reserva %}
+                <span class="badge text-bg-success">Ya estas inscrito</span>
+                {% if reserva.estado_pago == 'confirmado' %}
+                    <span class="badge text-bg-success">Pago confirmado</span>
+                {% else %}
+                    <span class="badge text-bg-warning">Pago pendiente</span>
+                {% endif %}
+                <a href="{% url 'mis_reservas' %}" class="btn btn-outline-secondary btn-sm">Ver mis reservas</a>
+                {% if puede_valorar %}
+                    <a href="{% url 'valorar' reserva.pk %}" class="btn btn-primary btn-sm">
+                        {% if mi_valoracion %}Editar mi valoracion{% else %}Valorar experiencia{% endif %}
+                    </a>
+                {% endif %}
+            {% elif puede_inscribirse %}
+                <form method="post" action="{% url 'inscribirse' e.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Inscribirme</button>
+                </form>
+            {% elif e.estado_ruta != 'programada' %}
+                <span class="badge text-bg-secondary">Ruta {{ e.get_estado_ruta_display|lower }}</span>
+            {% elif ya_paso %}
+                <span class="badge text-bg-secondary">Esta experiencia ya se realizo</span>
+            {% else %}
+                <span class="badge text-bg-secondary">Sin cupos disponibles</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h3 class="card-title">Valoraciones</h3></div>
+    <div class="card-body">
+        {% if resumen.total %}
+            <p class="fs-5">
+                <span class="estrellas-fijas">★</span> <strong>{{ resumen.promedio|floatformat:1 }}</strong> / 5
+                <span class="text-secondary fs-6">· {{ resumen.total }} valoracion{{ resumen.total|pluralize:"es" }}</span>
+            </p>
+            <ul class="list-group list-group-flush">
+            {% for v in valoraciones %}
+                <li class="list-group-item px-0">
+                    <span class="estrellas-fijas">{{ v.estrellas }}</span>
+                    <strong class="ms-1">{{ v.inscripcion.usuario.first_name|default:v.inscripcion.usuario.username }}</strong>
+                    <span class="text-secondary small ms-1">{{ v.fecha|date:"d/m/Y" }}</span>
+                    {% if v.comentario %}<p class="mb-0 mt-1">{{ v.comentario|linebreaksbr }}</p>{% endif %}
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-secondary mb-0">Aun no hay valoraciones para esta experiencia.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

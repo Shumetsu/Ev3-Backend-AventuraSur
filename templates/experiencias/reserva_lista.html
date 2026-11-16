@@ -1,0 +1,66 @@
+{% extends 'base_admin.html' %}
+{% block title %}Reservas · Aventuras del Sur{% endblock %}
+{% block titulo_pagina %}Reservas{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header"><h3 class="card-title">Todas las inscripciones del sistema</h3></div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="tabla-reservas" class="table table-hover align-middle w-100">
+                <thead>
+                    <tr>
+                        <th>Turista</th><th>Experiencia</th><th>Fecha</th>
+                        <th>Precio</th><th>Inscrito el</th><th>Pago</th><th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for r in reservas %}
+                    <tr>
+                        <td>{{ r.usuario.get_full_name|default:r.usuario.username }}</td>
+                        <td>{{ r.experiencia.titulo }}</td>
+                        <td data-order="{{ r.experiencia.fecha_hora|date:'Y-m-d H:i' }}">{{ r.experiencia.fecha_hora|date:'d/m/Y H:i' }}</td>
+                        <td data-order="{{ r.experiencia.precio|floatformat:0 }}">${{ r.experiencia.precio|floatformat:"0g" }}</td>
+                        <td data-order="{{ r.fecha_inscripcion|date:'Y-m-d H:i' }}">{{ r.fecha_inscripcion|date:'d/m/Y H:i' }}</td>
+                        <td>
+                            {% if r.estado_pago == 'confirmado' %}
+                                <span class="badge text-bg-success">Confirmado</span>
+                            {% else %}
+                                <span class="badge text-bg-warning">Pendiente</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="post" action="{% url 'reserva_estado' r.pk %}">
+                                {% csrf_token %}
+                                {% if r.estado_pago == 'pendiente' %}
+                                    <button type="submit" class="btn btn-success btn-sm">Confirmar pago</button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm">Marcar pendiente</button>
+                                {% endif %}
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    $('#tabla-reservas').DataTable({
+        language: { url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json' },
+        order: [[4, 'desc']],
+        columnDefs: [{ orderable: false, targets: -1 }]
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+{% block title %}Panel · Aventuras del Sur{% endblock %}
+{% block titulo_pagina %}Panel{% endblock %}
+
+{% block content %}
+<p class="lead">Hola, <strong>{{ user.first_name|default:user.username }}</strong>.
+   Ingresaste como {{ user.perfil.get_rol_display }}.</p>
+
+{% if user.perfil.rol == 'turista' %}
+<div class="row">
+    <div class="col-md-6 col-xl-4 mb-4">
+        <div class="card text-bg-dark h-100">
+            <img src="{% static 'img/hero.jpg' %}" class="card-img" alt="" style="height:220px; object-fit:cover; opacity:.5">
+            <div class="card-img-overlay d-flex flex-column justify-content-end">
+                <h4 class="card-title">Catalogo</h4>
+                <p class="card-text">Mira las experiencias disponibles y reserva.</p>
+                <a href="{% url 'catalogo' %}" class="btn btn-light btn-sm align-self-start stretched-link">Explorar</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4 mb-4">
+        <div class="card text-bg-dark h-100">
+            <img src="{% static 'img/canopy.jpg' %}" class="card-img" alt="" style="height:220px; object-fit:cover; opacity:.5">
+            <div class="card-img-overlay d-flex flex-column justify-content-end">
+                <h4 class="card-title">Mis reservas</h4>
+                <p class="card-text">Revisa tus inscripciones y su estado de pago.</p>
+                <a href="{% url 'mis_reservas' %}" class="btn btn-light btn-sm align-self-start stretched-link">Ver reservas</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<div class="row">
+    <div class="col-md-6 col-xl-4">
+        <div class="small-box text-bg-primary">
+            <div class="inner"><h4>Experiencias</h4><p>Gestiona las actividades del ecoparque.</p></div>
+            <a href="{% url 'experiencia_lista' %}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-75-hover">
+                Abrir <i class="bi bi-arrow-right-circle"></i>
+            </a>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="small-box text-bg-info">
+            <div class="inner"><h4>Calendario</h4><p>Mira tus actividades por fecha.</p></div>
+            <a href="{% url 'calendario' %}" class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-75-hover">
+                Abrir <i class="bi bi-arrow-right-circle"></i>
+            </a>
+        </div>
+    </div>    
+    {% if user.perfil.rol == 'administrador' %}
+    <div class="col-md-6 col-xl-4">
+        <div class="small-box text-bg-success">
+            <div class="inner"><h4>Categorias</h4><p>Administra los tipos de experiencia.</p></div>
+            <a href="{% url 'categoria_lista' %}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-75-hover">
+                Abrir <i class="bi bi-arrow-right-circle"></i>
+            </a>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="small-box text-bg-warning">
+            <div class="inner"><h4>Reservas</h4><p>Revisa las inscripciones y confirma pagos.</p></div>
+            <a href="{% url 'reserva_lista' %}" class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-75-hover">
+                Abrir <i class="bi bi-arrow-right-circle"></i>
+            </a>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="small-box text-bg-danger">
+            <div class="inner"><h4>Usuarios</h4><p>Crea cuentas y asigna roles.</p></div>
+            <a href="{% url 'usuario_lista' %}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-75-hover">
+                Abrir <i class="bi bi-arrow-right-circle"></i>
+            </a>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="small-box text-bg-info">
+            <div class="inner"><h4>Guias</h4><p>Revisa a tus guias y su actividad.</p></div>
+            <a href="{% url 'guia_lista' %}" class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-75-hover">
+                Abrir <i class="bi bi-arrow-right-circle"></i>
+            </a>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="small-box text-bg-secondary">
+            <div class="inner"><h4>Reportes</h4><p>Ingresos, ocupacion y valoraciones.</p></div>
+            <a href="{% url 'reportes' %}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-75-hover">
+                Abrir <i class="bi bi-arrow-right-circle"></i>
+            </a>
+        </div>
+    </div> 
+    <div class="col-md-6 col-xl-4">
+        <div class="small-box text-bg-dark">
+            <div class="inner"><h4>Configuracion</h4><p>Datos del ecoparque y la landing.</p></div>
+            <a href="{% url 'configuracion' %}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-75-hover">
+                Abrir <i class="bi bi-arrow-right-circle"></i>
+            </a>
+        </div>
+    </div>   
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

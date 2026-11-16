@@ -1,0 +1,4 @@
+{% if e.estado_ruta == 'programada' %}<span class="badge text-bg-info">Programada</span>
+{% elif e.estado_ruta == 'en_curso' %}<span class="badge text-bg-warning">En curso</span>
+{% elif e.estado_ruta == 'finalizada' %}<span class="badge text-bg-success">Finalizada</span>
+{% else %}<span class="badge text-bg-danger">Cancelada</span>{% endif %}

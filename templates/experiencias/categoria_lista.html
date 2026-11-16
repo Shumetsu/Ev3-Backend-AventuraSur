@@ -1,0 +1,63 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+{% block title %}Categorias · Aventuras del Sur{% endblock %}
+{% block titulo_pagina %}Categorias{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Tipos de experiencia del ecoparque</h3>
+        <div class="card-tools">
+            <a href="{% url 'categoria_crear' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Nueva categoria</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="tabla-categorias" class="table table-hover align-middle w-100">
+                <thead>
+                    <tr><th>Nombre</th><th>Descripcion</th><th>Estado</th><th>Acciones</th></tr>
+                </thead>
+                <tbody>
+                {% for c in categorias %}
+                    <tr>
+                        <td>{{ c.nombre }}</td>
+                        <td>{{ c.descripcion|default:"—" }}</td>
+                        <td>
+                            {% if c.activo %}<span class="badge text-bg-success">Activa</span>
+                            {% else %}<span class="badge text-bg-secondary">Inactiva</span>{% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'categoria_editar' c.pk %}" class="btn btn-outline-primary btn-sm">Editar</a>
+                                <button type="button" class="btn btn-outline-danger btn-sm btn-eliminar"
+                                        data-url="{% url 'categoria_eliminar' c.pk %}"
+                                        data-nombre="{{ c.nombre }}">Eliminar</button>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% include 'includes/bs_modal_eliminar.html' with titulo="Eliminar categoria" %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    $('#tabla-categorias').DataTable({
+        language: { url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json' },
+        columnDefs: [{ orderable: false, targets: -1 }]
+    });
+</script>
+<script src="{% static 'js/bs_eliminar.js' %}"></script>
+{% endblock %}

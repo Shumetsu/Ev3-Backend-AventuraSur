@@ -1,0 +1,45 @@
+@font-face { font-family: 'Poppins'; font-weight: 400; src: url('../fonts/poppins-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Poppins'; font-weight: 500; src: url('../fonts/poppins-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Poppins'; font-weight: 600; src: url('../fonts/poppins-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Poppins'; font-weight: 700; src: url('../fonts/poppins-latin-700-normal.woff2') format('woff2'); }
+
+body { font-family: 'Poppins', system-ui, sans-serif; }
+
+/* Colores de marca */
+.app-sidebar { background-color: #0B3A75 !important; }
+.btn-primary {
+  --bs-btn-bg: #0B3A75; --bs-btn-border-color: #0B3A75;
+  --bs-btn-hover-bg: #082B58; --bs-btn-hover-border-color: #082B58;
+  --bs-btn-active-bg: #082B58; --bs-btn-active-border-color: #082B58;
+  --bs-btn-disabled-bg: #0B3A75; --bs-btn-disabled-border-color: #0B3A75;
+}
+.text-bg-primary { background-color: #0B3A75 !important; }
+
+/* Icono de montana de la marca */
+.brand-mountain {
+  display: inline-block; width: 26px; height: 26px; margin-right: 0.6rem; vertical-align: middle;
+  background: #fff;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M1 20 9 6l4.5 7.5L16 10l7 10z'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M1 20 9 6l4.5 7.5L16 10l7 10z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* Selector de estrellas (se usa en Valorar) */
+.estrellas { display: inline-flex; flex-direction: row-reverse; gap: 0.25rem; }
+.estrellas input { display: none; }
+.estrellas label { font-size: 2.4rem; line-height: 1; color: #cbd5e1; cursor: pointer; transition: color 0.1s; }
+.estrellas input:checked ~ label,
+.estrellas label:hover,
+.estrellas label:hover ~ label { color: #f59e0b; }
+.estrellas-fijas { color: #f59e0b; letter-spacing: 0.1em; }
+
+/* Calendario mensual */
+.calendario td { height: 110px; vertical-align: top; width: 14.28%; padding: 0.4rem; }
+.calendario .numero-dia { font-size: 0.85rem; color: #6c757d; margin-bottom: 0.25rem; }
+.calendario .dia-hoy { background-color: rgba(11, 58, 117, 0.06); }
+.calendario .evento {
+  display: block; margin-bottom: 0.2rem; padding: 0.15rem 0.35rem;
+  border-radius: 4px; font-size: 0.75rem; line-height: 1.25;
+  text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.calendario .evento:hover { opacity: 0.85; }
+@media (max-width: 768px) { .calendario td { height: 80px; font-size: 0.7rem; } }

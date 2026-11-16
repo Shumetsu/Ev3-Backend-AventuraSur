@@ -1,0 +1,9 @@
+{% extends 'base_auth.html' %}
+{% block content %}
+<div class="tarjeta-centrada error-pagina">
+    <p class="error-codigo">403</p>
+    <h1>Acceso denegado</h1>
+    <p>No tienes permisos para ver esta pagina.</p>
+    <a href="{% url 'home' %}" class="btn-pildora">Volver al inicio</a>
+</div>
+{% endblock %}

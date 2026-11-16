@@ -1,0 +1,77 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+{% block title %}Mis reservas · Aventuras del Sur{% endblock %}
+{% block titulo_pagina %}Mis reservas{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header"><h3 class="card-title">Tu historial de inscripciones</h3></div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="tabla-reservas" class="table table-hover align-middle w-100">
+                <thead>
+                    <tr>
+                        <th>Experiencia</th><th>Categoria</th><th>Fecha</th>
+                        <th>Precio</th><th>Inscrito el</th><th>Pago</th><th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for r in reservas %}
+                    <tr>
+                        <td><a href="{% url 'experiencia_detalle' r.experiencia.pk %}" class="fw-semibold text-decoration-none">{{ r.experiencia.titulo }}</a></td>
+                        <td>{{ r.experiencia.categoria.nombre }}</td>
+                        <td data-order="{{ r.experiencia.fecha_hora|date:'Y-m-d H:i' }}">{{ r.experiencia.fecha_hora|date:'d/m/Y H:i' }}</td>
+                        <td data-order="{{ r.experiencia.precio|floatformat:0 }}">${{ r.experiencia.precio|floatformat:"0g" }}</td>
+                        <td data-order="{{ r.fecha_inscripcion|date:'Y-m-d H:i' }}">{{ r.fecha_inscripcion|date:'d/m/Y H:i' }}</td>
+                        <td>
+                            {% if r.estado_pago == 'confirmado' %}
+                                <span class="badge text-bg-success">Confirmado</span>
+                            {% else %}
+                                <span class="badge text-bg-warning">Pendiente</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-1">
+                                {% if r.asistio and r.experiencia.estado_ruta == 'finalizada' %}
+                                    {% if r.valoracion %}
+                                        <span class="estrellas-fijas" title="Tu valoracion">{{ r.valoracion.estrellas }}</span>
+                                        <a href="{% url 'valorar' r.pk %}" class="btn btn-outline-secondary btn-sm">Editar</a>
+                                    {% else %}
+                                        <a href="{% url 'valorar' r.pk %}" class="btn btn-primary btn-sm">Valorar</a>
+                                    {% endif %}
+                                {% endif %}
+                                {% if r.estado_pago == 'pendiente' %}
+                                <button type="button" class="btn btn-outline-danger btn-sm btn-eliminar"
+                                        data-url="{% url 'cancelar_reserva' r.pk %}"
+                                        data-nombre="{{ r.experiencia.titulo }}">Cancelar</button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% include 'includes/bs_modal_eliminar.html' with titulo="Cancelar reserva" verbo="cancelar tu reserva en" boton="Cancelar reserva" volver="Volver" aviso="Perderas tu cupo." %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    $('#tabla-reservas').DataTable({
+        language: { url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json' },
+        order: [[4, 'desc']],
+        columnDefs: [{ orderable: false, targets: -1 }]
+    });
+</script>
+<script src="{% static 'js/bs_eliminar.js' %}"></script>
+{% endblock %}

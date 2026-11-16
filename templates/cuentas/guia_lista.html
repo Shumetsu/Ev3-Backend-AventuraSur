@@ -1,0 +1,58 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+{% block title %}Guias · Aventuras del Sur{% endblock %}
+{% block titulo_pagina %}Guias{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Guias del ecoparque y su actividad</h3>
+        <div class="card-tools">
+            <a href="{% url 'usuario_crear' %}?rol=guia" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Nuevo guia</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="tabla-guias" class="table table-hover align-middle w-100">
+                <thead>
+                    <tr><th>Guia</th><th>Correo</th><th>Telefono</th><th>Experiencias</th><th>Inscritos</th><th>Estado</th><th>Acciones</th></tr>
+                </thead>
+                <tbody>
+                {% for g in guias %}
+                    <tr>
+                        <td>{{ g.get_full_name|default:g.username }}</td>
+                        <td>{{ g.email|default:"—" }}</td>
+                        <td>{{ g.perfil.telefono|default:"—" }}</td>
+                        <td>{{ g.n_experiencias }}</td>
+                        <td>{{ g.n_inscritos }}</td>
+                        <td>
+                            {% if g.is_active %}<span class="badge text-bg-success">Activo</span>
+                            {% else %}<span class="badge text-bg-secondary">Inactivo</span>{% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'usuario_editar' g.pk %}" class="btn btn-outline-primary btn-sm">Editar</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    $('#tabla-guias').DataTable({
+        language: { url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json' },
+        columnDefs: [{ orderable: false, targets: -1 }]
+    });
+</script>
+{% endblock %}

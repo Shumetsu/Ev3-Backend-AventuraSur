@@ -1,0 +1,19 @@
+{% extends 'base_auth.html' %}
+{% block title %}Crear cuenta - Aventuras del Sur{% endblock %}
+{% block content %}
+<div class="tarjeta-centrada">
+    <h1 style="font-size:1.8rem">Crear cuenta</h1>
+    <p class="texto-suave">Registrate como turista para reservar experiencias.</p>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            {% include 'includes/campo.html' with field=field %}
+        {% endfor %}
+        <button type="submit" class="btn btn-primario btn-bloque">Registrarme</button>
+    </form>
+    <p class="texto-suave" style="text-align:center;margin-top:1.25rem">
+        ¿Ya tienes cuenta? <a href="{% url 'login' %}">Ingresa</a>
+    </p>
+    <p class="pie-tarjeta">Aventuras del Sur</p>
+</div>
+{% endblock %}

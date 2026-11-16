@@ -1,0 +1,220 @@
+{% extends 'base_admin.html' %}
+{% block title %}Reportes · Aventuras del Sur{% endblock %}
+{% block titulo_pagina %}Reportes globales{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+{% endblock %}
+
+{% block content %}
+
+<!-- Filtro por fecha de la experiencia -->
+<div class="card">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label for="desde" class="form-label mb-1">Desde</label>
+                <input type="date" id="desde" name="desde" class="form-control" value="{{ desde|date:'Y-m-d' }}">
+            </div>
+            <div class="col-md-3">
+                <label for="hasta" class="form-label mb-1">Hasta</label>
+                <input type="date" id="hasta" name="hasta" class="form-control" value="{{ hasta|date:'Y-m-d' }}">
+            </div>
+            <div class="col-md-6 d-flex flex-wrap gap-2">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-funnel"></i> Filtrar</button>
+                <a href="{% url 'reportes' %}" class="btn btn-outline-secondary">Limpiar</a>
+                <a href="{% url 'reportes_csv' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
+                   class="btn btn-success ms-md-auto"><i class="bi bi-file-earmark-spreadsheet"></i> Exportar</a>
+            </div>
+        </form>
+        <p class="text-secondary small mb-0 mt-2">
+            El filtro usa la fecha de realizacion de cada experiencia. Resultados sobre {{ resumen.n_experiencias }} experiencia{{ resumen.n_experiencias|pluralize }}.
+        </p>
+    </div>
+</div>
+
+<!-- Cajas de resumen -->
+<div class="row">
+    <div class="col-md-6 col-xl-4">
+        <div class="info-box">
+            <span class="info-box-icon text-bg-success shadow-sm"><i class="bi bi-cash-coin"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Ingresos confirmados</span>
+                <span class="info-box-number">${{ resumen.ingresos_conf|floatformat:"0g" }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="info-box">
+            <span class="info-box-icon text-bg-warning shadow-sm"><i class="bi bi-hourglass-split"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Ingresos pendientes de pago</span>
+                <span class="info-box-number">${{ resumen.ingresos_pend|floatformat:"0g" }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="info-box">
+            <span class="info-box-icon text-bg-primary shadow-sm"><i class="bi bi-ticket-perforated"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Reservas</span>
+                <span class="info-box-number">{{ resumen.reservas }}
+                    <small class="text-secondary fw-normal">({{ resumen.confirmadas }} confirmadas, {{ resumen.pendientes }} pendientes)</small>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="info-box">
+            <span class="info-box-icon text-bg-info shadow-sm"><i class="bi bi-speedometer2"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Ocupacion global</span>
+                <span class="info-box-number">{{ resumen.ocupacion }}%</span>
+                <div class="progress"><div class="progress-bar" style="width: {{ resumen.ocupacion }}%"></div></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="info-box">
+            <span class="info-box-icon text-bg-secondary shadow-sm"><i class="bi bi-people"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Turistas con reservas</span>
+                <span class="info-box-number">{{ resumen.turistas }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="info-box">
+            <span class="info-box-icon text-bg-danger shadow-sm"><i class="bi bi-star-fill"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Valoracion promedio</span>
+                <span class="info-box-number">
+                    {% if resumen.promedio %}{{ resumen.promedio }} / 5
+                    <small class="text-secondary fw-normal">({{ resumen.n_valoraciones }})</small>
+                    {% else %}<small class="text-secondary fw-normal">Sin valoraciones</small>{% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Graficos -->
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Reservas por estado de pago</h3></div>
+            <div class="card-body"><div style="position:relative; height:300px"><canvas id="graf-estado"></canvas></div></div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Ocupacion por experiencia</h3></div>
+            <div class="card-body"><div style="position:relative; height:300px"><canvas id="graf-ocupacion"></canvas></div></div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Ingresos confirmados por categoria</h3></div>
+            <div class="card-body"><div style="position:relative; height:300px"><canvas id="graf-categorias"></canvas></div></div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Estado de las rutas</h3></div>
+            <div class="card-body"><div style="position:relative; height:300px"><canvas id="graf-ruta"></canvas></div></div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla detallada -->
+<div class="card">
+    <div class="card-header"><h3 class="card-title">Detalle por experiencia</h3></div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="tabla-reporte" class="table table-hover align-middle w-100">
+                <thead>
+                    <tr>
+                        <th>Experiencia</th><th>Categoria</th><th>Fecha</th><th>Ruta</th>
+                        <th>Inscritos</th><th>Ocupacion</th><th>Asistentes</th>
+                        <th>Ingresos</th><th>Valoracion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for f in filas %}
+                    <tr>
+                        <td>{{ f.titulo }}</td>
+                        <td>{{ f.categoria }}</td>
+                        <td data-order="{{ f.fecha|date:'Y-m-d H:i' }}">{{ f.fecha|date:'d/m/Y H:i' }}</td>
+                        <td>{{ f.ruta }}</td>
+                        <td data-order="{{ f.inscritos }}">{{ f.inscritos }} / {{ f.cupo }}</td>
+                        <td data-order="{{ f.ocupacion }}" style="min-width:120px">
+                            <div class="progress" style="height:8px"><div class="progress-bar" style="width: {{ f.ocupacion }}%"></div></div>
+                            <small class="text-secondary">{{ f.ocupacion }}%</small>
+                        </td>
+                        <td>{{ f.asistentes }}</td>
+                        <td data-order="{{ f.ingresos }}">${{ f.ingresos|floatformat:"0g" }}</td>
+                        <td data-order="{% if f.promedio %}{{ f.promedio }}{% else %}-1{% endif %}">
+                            {% if f.promedio %}<span class="estrellas-fijas">★</span> {{ f.promedio }} <small class="text-secondary">({{ f.n_val }})</small>
+                            {% else %}<span class="text-secondary">—</span>{% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{{ datos|json_script:"datos-reporte" }}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.js"></script>
+<script>
+    $('#tabla-reporte').DataTable({
+        language: { url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json' },
+        order: [[2, 'asc']]
+    });
+
+    const d = JSON.parse(document.getElementById('datos-reporte').textContent);
+    const opcionesBase = { responsive: true, maintainAspectRatio: false };
+    const peso = (v) => '$' + Number(v).toLocaleString('es-CL');
+
+    new Chart(document.getElementById('graf-estado'), {
+        type: 'doughnut',
+        data: { labels: d.estado.labels,
+                datasets: [{ data: d.estado.valores, backgroundColor: ['#198754', '#ffc107'] }] },
+        options: { ...opcionesBase, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    new Chart(document.getElementById('graf-ocupacion'), {
+        type: 'bar',
+        data: { labels: d.ocupacion.labels,
+                datasets: [{ label: 'Ocupacion (%)', data: d.ocupacion.valores, backgroundColor: '#0B3A75' }] },
+        options: { ...opcionesBase, indexAxis: 'y',
+                   plugins: { legend: { display: false } },
+                   scales: { x: { min: 0, max: 100, ticks: { callback: (v) => v + '%' } } } }
+    });
+
+    new Chart(document.getElementById('graf-categorias'), {
+        type: 'bar',
+        data: { labels: d.categorias.labels,
+                datasets: [{ label: 'Ingresos confirmados', data: d.categorias.valores, backgroundColor: '#198754' }] },
+        options: { ...opcionesBase,
+                   plugins: { legend: { display: false },
+                              tooltip: { callbacks: { label: (c) => peso(c.parsed.y) } } },
+                   scales: { y: { beginAtZero: true, ticks: { callback: peso } } } }
+    });
+
+    new Chart(document.getElementById('graf-ruta'), {
+        type: 'doughnut',
+        data: { labels: d.ruta.labels,
+                datasets: [{ data: d.ruta.valores,
+                             backgroundColor: ['#0dcaf0', '#ffc107', '#198754', '#dc3545'] }] },
+        options: { ...opcionesBase, plugins: { legend: { position: 'bottom' } } }
+    });
+</script>
+{% endblock %}

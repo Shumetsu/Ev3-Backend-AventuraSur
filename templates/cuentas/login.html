@@ -1,0 +1,28 @@
+{% extends 'base_auth.html' %}
+{% block title %}Ingresar - Aventuras del Sur{% endblock %}
+{% block content %}
+<div class="tarjeta-login">
+    <div class="login-contenido">
+        <p class="login-sistema">Ecoparque y Reserva Natural Aventuras del Sur</p>
+        <h1 class="login-titulo">Ingresar</h1>
+
+        {% if form.errors %}
+        <div class="aviso aviso-error">Usuario o contraseña incorrectos.</div>
+        {% endif %}
+
+        <form method="post" class="login-form">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
+            {% include 'includes/campo.html' with field=form.username %}
+            {% include 'includes/campo.html' with field=form.password %}
+            <div class="acciones">
+                <button type="submit" class="btn-pildora">Ingresar</button>
+            </div>
+        </form>
+        <p class="texto-suave" style="text-align:center;margin-top:1.5rem">
+            ¿No tienes cuenta? <a href="{% url 'registro' %}">Regístrate</a>
+        </p>
+    </div>
+    <p class="pie-tarjeta">Aventuras del Sur</p>
+</div>
+{% endblock %}

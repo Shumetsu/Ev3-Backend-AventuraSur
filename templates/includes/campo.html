@@ -1,0 +1,6 @@
+<div class="campo">
+    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+    {% if field.help_text %}<div class="texto-formulario">{{ field.help_text|safe }}</div>{% endif %}
+    {% for e in field.errors %}<div class="error">{{ e }}</div>{% endfor %}
+</div>

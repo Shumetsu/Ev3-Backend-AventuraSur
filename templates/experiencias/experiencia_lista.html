@@ -1,0 +1,81 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+{% block title %}Experiencias · Aventuras del Sur{% endblock %}
+{% block titulo_pagina %}{% if es_admin %}Experiencias{% else %}Mis experiencias{% endif %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">
+            {% if es_admin %}Todas las actividades del ecoparque{% else %}Las actividades que has registrado{% endif %}
+        </h3>
+        <div class="card-tools">
+            <a href="{% url 'experiencia_crear' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Nueva experiencia</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="tabla-experiencias" class="table table-hover align-middle w-100">
+                <thead>
+                    <tr>
+                        <th>Titulo</th><th>Categoria</th><th>Fecha</th><th>Precio</th>
+                        <th>Inscritos</th><th>Estado</th><th>Ruta</th>
+                        {% if es_admin %}<th>Creador</th>{% endif %}
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for e in experiencias %}
+                    <tr>
+                        <td>{{ e.titulo }}</td>
+                        <td>{{ e.categoria.nombre }}</td>
+                        <td data-order="{{ e.fecha_hora|date:'Y-m-d H:i' }}">{{ e.fecha_hora|date:'d/m/Y H:i' }}</td>
+                        <td data-order="{{ e.precio|floatformat:0 }}">${{ e.precio|floatformat:"0g" }}</td>
+                        <td>{{ e.n_inscritos }} / {{ e.cupo_maximo }}</td>
+                        <td>
+                            {% if e.activo %}<span class="badge text-bg-success">Activa</span>
+                            {% else %}<span class="badge text-bg-secondary">Inactiva</span>{% endif %}
+                        </td>
+                        <td>{% include 'includes/bs_badge_ruta.html' %}</td>
+                        {% if es_admin %}<td>{{ e.creador.username }}</td>{% endif %}
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'experiencia_grupo' e.pk %}" class="btn btn-outline-secondary btn-sm">Grupo</a>
+                                <a href="{% url 'experiencia_editar' e.pk %}" class="btn btn-outline-primary btn-sm">Editar</a>
+                                {% if es_admin %}
+                                <button type="button" class="btn btn-outline-danger btn-sm btn-eliminar"
+                                        data-url="{% url 'experiencia_eliminar' e.pk %}"
+                                        data-nombre="{{ e.titulo }}">Eliminar</button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% if es_admin %}
+    {% include 'includes/bs_modal_eliminar.html' with titulo="Eliminar experiencia" aviso="Tambien se eliminaran sus inscripciones." %}
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    $('#tabla-experiencias').DataTable({
+        language: { url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json' },
+        order: [[2, 'asc']],
+        columnDefs: [{ orderable: false, targets: -1 }]
+    });
+</script>
+<script src="{% static 'js/bs_eliminar.js' %}"></script>
+{% endblock %}

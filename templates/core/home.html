@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block layout %}
+<header class="navbar-vendedor">
+    <a class="marca" href="{% url 'home' %}"><span class="marca-punto"></span>Aventuras del Sur</a>
+    <div class="navbar-vendedor-links"></div>
+    <div class="navbar-vendedor-usuario">
+        {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="btn btn-claro btn-chico">Ir al panel</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-claro btn-chico">Ingresar</a>
+            <a href="{% url 'registro' %}" class="btn btn-acento btn-chico">Registrarse</a>
+        {% endif %}
+    </div>
+</header>
+
+<main>
+    {% if config.mensaje_landing %}
+    <div class="aviso aviso-info">{{ config.mensaje_landing }}</div>
+    {% endif %}
+    <section class="pos-tarjeta hero-fondo">
+        <h3>{{ config.nombre }}</h3>
+        <p class="hero-texto">{{ config.lema }}. {{ config.descripcion }}</p>
+        {% if not user.is_authenticated %}
+        <a href="{% url 'registro' %}" class="pos-boton">Reservar ahora</a>
+        {% endif %}
+    </section>
+
+    <h2 class="seccion-titulo">Lo que puedes hacer</h2>
+    <div class="accesos">
+        <div class="tarjeta tarjeta-actividad actividad-trekking"><h3>Trekking</h3><p class="texto-suave">Rutas guiadas por la reserva.</p></div>
+        <div class="tarjeta tarjeta-actividad actividad-canopy"><h3>Canopy</h3><p class="texto-suave">Recorre el bosque desde las alturas.</p></div>
+        <div class="tarjeta tarjeta-actividad actividad-kayak"><h3>Kayak</h3><p class="texto-suave">Navega por aguas tranquilas.</p></div>
+        <div class="tarjeta tarjeta-actividad actividad-equipos"><h3>Arriendo de equipos</h3><p class="texto-suave">Todo lo necesario para tu salida.</p></div>
+    </div>
+    <p class="texto-suave">
+        {% if config.direccion %}{{ config.direccion }} · {% endif %}
+        {% if config.horario %}{{ config.horario }}{% endif %}
+        {% if config.email %}<br>{{ config.email }}{% endif %}
+        {% if config.telefono %} · {{ config.telefono }}{% endif %}
+    </p>
+</main>
+{% endblock %}

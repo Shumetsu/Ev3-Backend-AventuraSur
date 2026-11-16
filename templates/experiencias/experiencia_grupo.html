@@ -1,0 +1,135 @@
+{% extends 'base_admin.html' %}
+{% block title %}Grupo · {{ e.titulo }}{% endblock %}
+{% block titulo_pagina %}Detalle del grupo{% endblock %}
+
+{% block content %}
+<a href="{% url 'experiencia_lista' %}" class="btn btn-outline-secondary btn-sm mb-3">
+    <i class="bi bi-arrow-left"></i> Volver a experiencias
+</a>
+
+<h4 class="mb-0">{{ e.titulo }}</h4>
+<p class="text-secondary">{{ e.categoria.nombre }} · {{ e.fecha_hora|date:"d/m/Y H:i" }}</p>
+
+<div class="row">
+    <div class="col-6 col-lg-3">
+        <div class="info-box">
+            <span class="info-box-icon text-bg-primary shadow-sm"><i class="bi bi-people"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Inscritos</span>
+                <span class="info-box-number">{{ total }} de {{ e.cupo_maximo }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="info-box">
+            <span class="info-box-icon text-bg-success shadow-sm"><i class="bi bi-check-circle"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Pagos confirmados</span>
+                <span class="info-box-number">{{ confirmados }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="info-box">
+            <span class="info-box-icon text-bg-warning shadow-sm"><i class="bi bi-hourglass-split"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Pagos pendientes</span>
+                <span class="info-box-number">{{ pendientes }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="info-box">
+            <span class="info-box-icon text-bg-info shadow-sm"><i class="bi bi-person-check"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Asistentes</span>
+                <span class="info-box-number">{{ asistentes }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body d-flex flex-wrap align-items-center gap-2">
+        <strong>Estado de la ruta:</strong>
+        {% include 'includes/bs_badge_ruta.html' %}
+        {% for est, etiqueta in acciones %}
+        <form method="post" action="{% url 'experiencia_estado' e.pk %}"
+              {% if est == 'cancelada' %}onsubmit="return confirm('¿Seguro que quieres cancelar esta ruta?')"{% endif %}>
+            {% csrf_token %}
+            <input type="hidden" name="estado" value="{{ est }}">
+            <button type="submit" class="btn btn-sm {% if est == 'cancelada' %}btn-danger{% else %}btn-primary{% endif %}">{{ etiqueta }}</button>
+        </form>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h3 class="card-title">Inscritos y asistencia</h3></div>
+    <form method="post" action="{% url 'experiencia_asistencia' e.pk %}">
+        {% csrf_token %}
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr><th>Turista</th><th>Correo</th><th>Telefono</th><th>Inscrito el</th><th>Pago</th><th class="text-center">Asistio</th></tr>
+                    </thead>
+                    <tbody>
+                    {% for i in inscritos %}
+                        <tr>
+                            <td>{{ i.usuario.get_full_name|default:i.usuario.username }}</td>
+                            <td>{{ i.usuario.email|default:"—" }}</td>
+                            <td>{{ i.usuario.perfil.telefono|default:"—" }}</td>
+                            <td>{{ i.fecha_inscripcion|date:'d/m/Y H:i' }}</td>
+                            <td>
+                                {% if i.estado_pago == 'confirmado' %}<span class="badge text-bg-success">Confirmado</span>
+                                {% else %}<span class="badge text-bg-warning">Pendiente</span>{% endif %}
+                            </td>
+                            <td class="text-center">
+                                <input type="checkbox" class="form-check-input" name="asistio" value="{{ i.pk }}"
+                                       {% if i.asistio %}checked{% endif %}
+                                       {% if not puede_asistencia %}disabled{% endif %}>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="6" class="text-secondary">Aun no hay inscritos.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            {% if puede_asistencia %}
+                <span></span>
+                <button type="submit" class="btn btn-primary">Guardar asistencia</button>
+            {% else %}
+                <span class="text-secondary">La asistencia se puede registrar cuando la ruta este en curso o finalizada.</span>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-header"><h3 class="card-title">Valoraciones</h3></div>
+    <div class="card-body">
+        {% if resumen.total %}
+            <p class="fs-5">
+                <span class="estrellas-fijas">★</span> <strong>{{ resumen.promedio|floatformat:1 }}</strong> / 5
+                <span class="text-secondary fs-6">· {{ resumen.total }} valoracion{{ resumen.total|pluralize:"es" }}</span>
+            </p>
+            <ul class="list-group list-group-flush">
+            {% for v in valoraciones %}
+                <li class="list-group-item px-0">
+                    <span class="estrellas-fijas">{{ v.estrellas }}</span>
+                    <strong class="ms-1">{{ v.inscripcion.usuario.first_name|default:v.inscripcion.usuario.username }}</strong>
+                    <span class="text-secondary small ms-1">{{ v.fecha|date:"d/m/Y" }}</span>
+                    {% if v.comentario %}<p class="mb-0 mt-1">{{ v.comentario|linebreaksbr }}</p>{% endif %}
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-secondary mb-0">Todavia no hay valoraciones.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
