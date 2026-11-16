@@ -10,13 +10,16 @@
             <form method="post">
                 {% csrf_token %}
                 <div class="card-body">
-                    <div class="row">
+                    <div class="row">                        
                         <div class="col-12">{% include 'includes/bs_campo.html' with field=form.titulo %}</div>
                         <div class="col-12">{% include 'includes/bs_campo.html' with field=form.descripcion %}</div>
                         <div class="col-md-6">{% include 'includes/bs_campo.html' with field=form.categoria %}</div>
                         <div class="col-md-6">{% include 'includes/bs_campo.html' with field=form.fecha_hora %}</div>
                         <div class="col-md-6">{% include 'includes/bs_campo.html' with field=form.precio %}</div>
                         <div class="col-md-6">{% include 'includes/bs_campo.html' with field=form.cupo_maximo %}</div>
+                        {% if es_admin %}
+                        <div class="col-12">{% include 'includes/bs_campo.html' with field=form.creador %}</div>
+                        {% endif %}                        
                         <div class="col-12">{% include 'includes/bs_campo.html' with field=form.activo %}</div>
                     </div>
                 </div>

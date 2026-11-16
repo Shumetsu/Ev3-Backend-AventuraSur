@@ -2,6 +2,8 @@ from django import forms
 from django.db.models import Q
 from django.utils import timezone
 from .models import Categoria, Experiencia, Valoracion
+from django.contrib.auth.models import User
+from cuentas.models import Perfil
 
 class CategoriaForm(forms.ModelForm):
     class Meta:
@@ -14,7 +16,7 @@ class ExperienciaForm(forms.ModelForm):
     class Meta:
         model = Experiencia
         fields = ['titulo', 'descripcion', 'categoria', 'precio',
-                  'cupo_maximo', 'fecha_hora', 'activo']
+                  'cupo_maximo', 'fecha_hora', 'activo', 'creador']
         labels = {
             'titulo': 'Titulo',
             'descripcion': 'Descripcion',
@@ -23,6 +25,7 @@ class ExperienciaForm(forms.ModelForm):
             'cupo_maximo': 'Cupo maximo',
             'fecha_hora': 'Fecha y hora',
             'activo': 'Experiencia activa (visible para turistas)',
+            'creador': 'Guia a cargo',
         }
         widgets = {
             'descripcion': forms.Textarea(attrs={'rows': 4}),
@@ -32,14 +35,29 @@ class ExperienciaForm(forms.ModelForm):
                 format='%Y-%m-%dT%H:%M', attrs={'type': 'datetime-local'}),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, es_admin=False, usuario=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['fecha_hora'].input_formats = ['%Y-%m-%dT%H:%M']
 
+        # Solo categorias activas (mas la actual, si se edita una inactiva)
         filtro = Q(activo=True)
         if self.instance.pk:
             filtro |= Q(pk=self.instance.categoria_id)
         self.fields['categoria'].queryset = Categoria.objects.filter(filtro)
+
+        if es_admin:
+            # El admin elige entre los guias activos, y tambien puede quedar el mismo
+            posibles = Q(perfil__rol=Perfil.GUIA, is_active=True)
+            if usuario is not None:
+                posibles |= Q(pk=usuario.pk)
+            if self.instance.pk:
+                posibles |= Q(pk=self.instance.creador_id)
+            self.fields['creador'].queryset = (User.objects.filter(posibles)
+                                               .distinct().order_by('first_name', 'username'))
+            self.fields['creador'].empty_label = None
+        else:
+            # El guia no elige: la vista le asigna su propio usuario
+            del self.fields['creador']
 
     def clean_precio(self):
         precio = self.cleaned_data['precio']

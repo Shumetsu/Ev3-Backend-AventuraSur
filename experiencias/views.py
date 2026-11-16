@@ -78,27 +78,31 @@ def experiencia_lista(request):
 
 @rol_requerido('administrador', 'guia')
 def experiencia_crear(request):
-    form = ExperienciaForm(request.POST or None)
+    es_admin = request.user.perfil.rol == 'administrador'
+    form = ExperienciaForm(request.POST or None, es_admin=es_admin, usuario=request.user)
     if request.method == 'POST' and form.is_valid():
         experiencia = form.save(commit=False)
-        experiencia.creador = request.user
+        if not es_admin:
+            experiencia.creador = request.user
         experiencia.save()
         messages.success(request, 'Experiencia creada correctamente.')
         return redirect('experiencia_lista')
     return render(request, 'experiencias/experiencia_form.html',
-                  {'form': form, 'titulo': 'Nueva experiencia'})
+                  {'form': form, 'titulo': 'Nueva experiencia', 'es_admin': es_admin})
 
 
 @rol_requerido('administrador', 'guia')
 def experiencia_editar(request, pk):
+    es_admin = request.user.perfil.rol == 'administrador'
     experiencia = get_object_or_404(_experiencias_visibles(request.user), pk=pk)
-    form = ExperienciaForm(request.POST or None, instance=experiencia)
+    form = ExperienciaForm(request.POST or None, instance=experiencia,
+                           es_admin=es_admin, usuario=request.user)
     if request.method == 'POST' and form.is_valid():
         form.save()
         messages.success(request, 'Experiencia actualizada correctamente.')
         return redirect('experiencia_lista')
     return render(request, 'experiencias/experiencia_form.html',
-                  {'form': form, 'titulo': 'Editar experiencia'})
+                  {'form': form, 'titulo': 'Editar experiencia', 'es_admin': es_admin})
 
 
 @rol_requerido('administrador')
